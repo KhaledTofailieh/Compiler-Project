@@ -1,0 +1,390 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+}
+
+PARSER_BEGIN(AINL)
+package newLang;
+import nodes.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+public class AINL
+{
+  static HashMap< String,FunctionNode> functionTabel=new HashMap();
+  public static void main(String args []) throws ParseException,FileNotFoundException
+  {
+    
+   FileInputStream file =new FileInputStream("D:\\data\\test.txt");
+   AINL parser=new AINL(file);
+   Node n = start();
+   n.execute(new context());
+ }
+}
+PARSER_END(AINL)
+
+SKIP :
+{
+  " "
+| "\r" //this is just Regular Expression but we can't access them
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+"|"-" >
+| < MULTIPLY : "*"|"/" >
+| < IPLUA : "+=" >
+| < IMINUS: "-=" >
+| < IMULTIPLAY : "*=" >
+| < IDIVIDE: "/=" >
+| < POWER: "^" >
+| < PERCENT: "%">
+| < IPERCENT:"%=">
+| < COMPR : ">" |"<" | ">=" | "<=" | "<>" | "=" >
+| < LOGICCOMPR : "and" | "or" >
+}
+
+TOKEN :
+{
+  <NUM:(["0"-"9"])+("."(["0"-"9"])+)?(("e"|"E")("+"|"-")(["0"-"9"]))? >
+| < LP:"(">
+| < RP:")">
+| < DEF:"def">
+| < KEY:"int" | "string" |"double">
+| < READ:"->">
+| < COUT : "\"">
+| < WRITE:"<-">
+| < ASSIGN :":=">
+| < IF:"?">
+| < ELSE:"??">
+| <END:"!" >
+| < FOR:"&">
+| < ENDFOR:"END">
+| < FUNC:"func">
+| < LOOP:"-->">
+| < SIMCOL:";">
+| < WHILE:"@">
+| < COLON:":">
+| < RETURN :"return" >
+| < COMA: ",">
+| < PRO:"_">
+| < ID : (["a"-"z"]|["A"-"Z"])(["0"-"9"]|["a"-"z"]|["A"-"Z"])* >
+//|  < ID: (["a"-"z"]|["A"-"Z"])(["a"-"z"]|["0"-"9"]|"_")* > 
+
+}
+
+BlockNode start():
+{
+  Node n;
+  BlockNode res=new BlockNode();
+}
+{
+   (  n=statment()  { res.addChildren(n);  }  ) + <EOF>
+
+   {
+      return res;
+
+   }
+
+}
+DiffineVar diffineVar():
+ {
+	DiffineVar res=new DiffineVar();
+	Token t,t1;
+ }
+ {
+  < DEF>t=< ID>< COLON> t1=< KEY>< SIMCOL>
+  {
+    res.setName(t.image);
+    res.setType(t1.image);
+    return res;
+  }
+ }
+
+Expreation E():
+{
+  Token t=null;
+  Expreation n1,n2=null;
+}
+{
+   n1=F() (t=< PLUS> n2=E())? 
+	{
+	  if(t==null) { 
+	   return n1;
+	   }
+	   else {
+	     Expreation res=new Expreation();
+	     res.addChildren(n1);
+	     res.addChildren(n2);
+	     res.setOperator(t.image);
+	     return res;
+	   }
+	}
+
+ }
+
+Expreation F():
+{
+  Token t=null;
+  Expreation n1,n2=null;
+}
+{
+   n1=N()(t=< MULTIPLY> n2=F())?
+
+	{
+	  if(t==null) { 
+	   return n1;
+	   }
+	   else {
+	     Expreation res=new Expreation();
+	     res.addChildren(n1);
+	     res.addChildren(n2);
+	     res.setOperator(t.image);
+	     return res;
+	   }
+	}
+}
+
+Expreation N():
+{
+  Token t1=null,t2=null,t3=null;
+  Expreation n=null;
+}
+{
+  (
+    t1=< NUM>| < LP>n=E()< RP> |LOOKAHEAD(2) n=prototibe()| t2 = <ID>
+    | < COUT> t3=< ID> < COUT>
+  )
+  {
+    if(t1!=null) {
+      Constant cn=new Constant();
+		//if(t1.image.contains("."))
+	  		cn.setValue(Double.parseDouble(t1.image));
+	  	//else
+	  		//cn.setValue(Integer.parseInt(t1.image));
+      return cn;
+    }
+    
+    else if(n!=null) {
+		return n;
+    }
+    else if(t2!=null){
+	Var vn=new Var();
+	vn.setVar(t2.image);
+	return vn;
+    }else {
+      Constant sn=new Constant();
+      sn.setValue(t3.image);
+      return sn;
+    }
+
+  }
+
+}
+
+assigNode assign():
+{
+Token t;
+assigNode res=new assigNode();
+Node enode;
+}
+
+  {
+      t=< ID>< ASSIGN>enode=E()< SIMCOL>
+      {
+        res.setVarName(t.image);
+        res.addChildren(enode);
+        return res;
+
+      }
+  }
+
+IF if_statment():
+{
+	IF res=new IF();
+	Node n,nn;
+	BlockNode cn=new BlockNode();
+	BlockNode en=null;
+	
+}
+
+{
+  <IF>< LP>n=fullcondation() <RP >(nn= statment() { cn.addChildren(nn);})+ (< ELSE > {en= new BlockNode();  }(nn = statment() {en.addChildren(nn); })+)? <END>
+	 {		
+		res.addChildren(n);
+		res.addChildren(cn);
+		if(en!=null)
+			res.addChildren(en);
+		return res;
+	}
+}
+fullCondation fullcondation():
+{  
+   Token t=null;
+   condationNode n=new condationNode();
+   Node nn=null;
+   fullCondation res=new fullCondation();
+}
+{
+ n=condation()(t=< LOGICCOMPR> nn=fullcondation())?
+ {
+   res.addChildren(n);
+   if(t!=null) {
+     res.setOperator(t.image);
+     res.addChildren(nn);
+   }
+   return res;
+ }
+
+}
+
+condationNode condation():
+{
+ condationNode res=new condationNode();
+ Node n;
+ Node nn;
+ Token t;
+}
+
+ {
+   n=E() t=< COMPR > nn=E()   
+	{
+	  res.addChildren(n);
+	  res.addChildren(nn);
+	  res.setOperator(t.image);
+	  return res;
+	}
+
+ }
+ 
+
+FOR for_statment():
+{
+ FOR res =new FOR();
+ Token t;
+ Node n1,n2,n4=null,tmp;
+ BlockNode n3=new BlockNode();
+}
+
+{
+  
+    < FOR>t=<ID >< COLON>n1=E()< LOOP>n2=E() (< COLON>n4=E())? (tmp=statment() { n3.addChildren(tmp);} )+ < END>
+
+{
+    res.addChildren(n1);
+    res.addChildren(n2);
+    res.addChildren(n3);
+    if(n4!=null)
+    	res.addChildren(n4);
+    res.setVarName(t.image);
+    return res;
+  }
+}
+
+
+Read read():
+{
+Read res= new Read();
+Token t;
+}
+
+{
+   < READ>t=<ID>< SIMCOL>
+   {
+	res.setVar(t.image);
+	return res;
+   }
+}
+
+Write write():
+{
+ Write res = new Write();
+ Node e;
+}
+
+{
+  <WRITE>e=E()< SIMCOL>
+  {
+    res.addChildren(e);
+    return res;
+  }
+
+}
+
+whileNode whil():
+{
+whileNode res=new whileNode();
+condationNode c=new condationNode();
+BlockNode b=new BlockNode();
+Node t;
+}
+
+{
+   < WHILE> < LP>c=condation() {  res.addChildren(c); }< RP> ( t = statment() { b.addChildren(t); })+< END>
+   {
+     res.addChildren(b);
+     return res;
+   }
+}
+
+Node statment():
+{
+   Node t=null;
+}
+{
+ (
+     t = whil() |LOOKAHEAD(2) t = assign()  | t=if_statment()  | t=for_statment()  | t=read()  | t=write()|function()|t=diffineVar()
+ )
+ {
+    if (t == null)
+  	  t = new BlockNode();
+    return t;
+ }
+
+}
+
+
+void function():
+{
+ FunctionNode res=new FunctionNode();
+ BlockNode b=new BlockNode();
+ Node tmp;
+ Token name,t=null;
+}
+{
+  < FUNC><LP >(t = < ID > {res.getParams().add(t.image); }
+	("," t = < ID > {res.getParams().add(t.image); } )*)? < RP > <READ>name=< ID>< COLON>
+	(tmp=statment() { b.addChildren(tmp); })*
+	
+	<END>   
+
+	{
+	  res.setName(name.image);
+	  res.setRoot(b);
+	  functionTabel.put(name.image,res);
+	}
+
+}
+
+FunctionCall  prototibe():
+ {
+  FunctionCall res=new FunctionCall(); 
+  Node tmp=null;
+  Token t;
+  }
+
+  { t=<ID><LP >(tmp=E() {res.addChildren(tmp); }("," tmp=E(){res.addChildren(tmp); } )*)?< RP>
+
+  {
+    res.setFunctionName(t.image);
+    res.setFunctions(functionTabel);
+    return res;
+  }
+  
+  }
+

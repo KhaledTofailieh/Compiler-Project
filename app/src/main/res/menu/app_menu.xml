@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<item
+        android:id="@+id/run_button"
+        android:icon="@drawable/play_btn_selector"
+        app:showAsAction="always" android:title="Play and Run">
+</item>
+    <item android:id="@+id/convert_btn"
+          android:icon="@drawable/convert"
+          app:showAsAction="always" android:title="Convert"/>
+</menu>

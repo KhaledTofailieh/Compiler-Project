@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/parent_color"
+            android:gravity="top"
+            tools:context="my.Activities.MainActivity"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="@dimen/margin_dim"
+                android:layout_marginRight="@dimen/margin_dim"
+                android:layout_marginLeft="@dimen/margin_dim"
+
+                android:layout_alignParentStart="true"
+                android:id="@+id/input_layout"
+                android:background="@color/main_color">
+
+            <EditText
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:textSize="@dimen/text_large_size"
+                    android:textColor="@color/text_color"
+                    android:id="@+id/input_view"
+                    android:backgroundTint="@color/text_color"
+            />
+
+
+        </FrameLayout>
+
+    <RelativeLayout
+            android:layout_width="409dp" android:layout_height="250dp"
+            android:layout_marginRight="@dimen/margin_dim"
+            android:layout_marginLeft="@dimen/margin_dim"
+            android:layout_marginBottom="32dp"
+            android:id="@+id/output_layout"
+            android:layout_below="@id/input_layout"
+
+            android:background="@color/parent_color" android:layout_marginTop="0dp">
+
+
+        <android.support.design.widget.TabLayout
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:id="@+id/tab_layout"
+                app:tabMode="fixed"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/item_backgraound"
+                app:tabTextColor="@color/unselected_color"
+                app:tabRippleColor="@color/unselected_color"
+                android:layout_alignParentTop="true"
+                app:tabIndicatorColor="@color/selected_color"
+                app:tabSelectedTextColor="@color/selected_color">
+
+            <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Output"
+                    android:textAlignment="center"/>
+            <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="Error"/>
+            <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="C++"/>
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+
+                android:layout_width="match_parent"
+                android:layout_height="2000dp"
+                android:id="@+id/mview_pager"
+                android:layout_marginTop="0dp" android:layout_below="@id/tab_layout"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
